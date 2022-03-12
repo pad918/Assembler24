@@ -7,10 +7,13 @@ Working:
   * writing generated code to file
   * Comments
   * .text segment
+  * .data variabel allocation (no value initialization)
 
 TO DO LIST:
-  * Fix command line arguments
-  * .data section
+  * .data section (value initialization)
+  * global labels
+  * Multiple assembly files
+  * Unicode textfiles
   * Hexadecimal and binary immidiates
   * macros
   * testing
