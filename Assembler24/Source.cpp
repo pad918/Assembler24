@@ -2,50 +2,47 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <filesystem>
+#include "Arguments.h"
 #include "vAssembler.h"
 
 /*
-INFO:
-	MIPS:	16 instruktioner
-			64 byte
-	asm24:	19 instruktioner (ADDI med två register finns inte)
-			57 byte
-			ca 11% mindre minne, men 19% fler instruktioner 
+	Arguments:
+		-i input file
+		-o output file
+
+	How to hanle arguments:
+		if no input file is selected ==> do nothing
+		if no output file is selected, write to out.txt file
 */	
 
 int main(int argc, char* argv[]) {
 /*
 TO DO :
-	Spara som en fil, välbart namn på filen
+
+	.text, .data section and global labels/variables
+
+	# include other asm files
+
+	macros
 
 */
-	
-	std::cout << "ARGS = " << argc << "\n";
-	//
-	if (argc >= 3) {
-		//Print help information:
-		printf("Illigal arguments. \nValid arguments:\n\t-i\tInput file\n\t-o\toutput file\n");
-		return 1;
+	Argument args;
+	try {
+		args = get_command_args(argc, argv);
+		std::cout << "ARGS = " << argc << "\n";
 	}
-	
-	std::string path = std::filesystem::current_path().string() + "\\";
-	if (argc > 1) {
-		std::string input_file(argv[1]);
-		//std::string output_file(argv[2]);
-		path += input_file;
+	catch (exception e) {
+		std::cout << "FAILED PARTING ARGUMENTS\n";
 	}
-	
-	if (argc <= 1) {
-		path = "C:/Users/mansa/source/repos/Assembler24/Assembler24/test.asm";
-	}
-	std::cout << path << "\n";
-	Assembler asmbler;
-	auto instructions = asmbler.assemble_file(path);
 
-	for (uint32_t& ins : instructions) {
-		std::printf("Inst = %x\n", ins);
-	}
-	asmbler.write_file(instructions);
+	//Print info
+	std::cout << "INPUT PATH = " << args.input_file << std::endl;
+	std::cout << "OUTPUT PATH = " << args.output_file << std::endl;
+
+	Assembler asmbler;
+	auto instructions = asmbler.assemble_file(args.input_file);
+
+	asmbler.write_file(args.output_file, instructions, false);
 	
 	return 0;
 }

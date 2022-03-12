@@ -8,11 +8,15 @@
 #include <unordered_map>
 #include <filesystem>
 #include "StringMagic.h"
+#define GLOBAL_START_ADRESS 512;
 
+enum inst_type { I_TYPE, IR_TYPE, R_TYPE };
+enum Section { DATA_SECTION, TEXT_SECTION, NO_SECTION };
 
 typedef struct {
 	int original_line_number;
 	string line;
+	Section section;
 } line_holder;
 
 typedef struct {
@@ -20,9 +24,11 @@ typedef struct {
 	uint8_t type;
 } instruction_definition;
 
-enum inst_type{I_TYPE, IR_TYPE, R_TYPE};
+
 
 class Assembler{
+private:
+	unsigned long global_pointer = GLOBAL_START_ADRESS;
 public:
 	Assembler();
 	std::unordered_map<std::string, uint32_t> label_map;
@@ -34,8 +40,10 @@ public:
 	
 	std::unordered_map<std::string, instruction_definition> instruction_map;
 
+
+
 	std::vector<std::string> R_type = { "ADD", "SUB", "SLT", "AND", "OR" };
-	std::vector<std::string> IR_type = { "ADDI", "AND", "OR", "STORE", "LOAD", "BZ", "BNZ"};
+	std::vector<std::string> IR_type = { "ADDI", "AND", "OR", "STORE", "LOAD", "BZ", "BNZ", "JR"};
 	std::vector<std::string> I_type = { "JAL", "LTA" };
 	
 	uint32_t decode_single_instruction(std::string line);
@@ -44,5 +52,5 @@ public:
 	std::vector<string> get_argument_strings(std::string line);
 	
 	std::vector<uint32_t> assemble_file(std::string path);
-	void write_file(const std::vector<uint32_t>& instructions);
+	void write_file(std::string path, const std::vector<uint32_t>& instructions, bool binary);
 };

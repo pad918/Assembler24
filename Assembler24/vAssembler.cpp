@@ -1,4 +1,4 @@
-#include "vAssembler.h"
+﻿#include "vAssembler.h"
 
 uint32_t Assembler::decode_single_instruction(std::string line)
 {
@@ -113,23 +113,90 @@ std::vector<uint32_t> Assembler::assemble_file(std::string path)
 		lines.push_back(holder);
 	}
 
-	//Remove empty lines and whitespace and comments:
+	//Macros?
+	
+	
+	//Remove empty lines and whitespace and comments and section specifyers:
+	Section section = NO_SECTION;
 	for (int i = 0; i < lines.size(); i++) {
+		lines[i].section = section;
+		
 		remove_comments(lines[i].line);
 		remove_leading_whitespace(lines[i].line);
 		if (lines[i].line.empty()) {
 			lines.erase(lines.begin() + i);
 			i--;
 		}
+
+		//Select section and remove section specifyer
+		else if (lines[i].line.compare(".data") == 0) {
+			section = DATA_SECTION;
+			lines.erase(lines.begin() + i);
+			i--;
+		}
+		else if (lines[i].line.compare(".text") == 0) {
+			section = TEXT_SECTION;
+			lines.erase(lines.begin() + i);
+			i--;
+		}
 	}
 
-	//Extract labels
+	//Handle include files 
+	//for (auto& line : lines) {
+	//	if (line.line.compare(0, 7, "include") == 0) {
+	//
+	//	}
+	//	else {
+	//		break;
+	//	}
+	//}
+
+	//Add .data labels to label map
+	for (int i = 0; i < lines.size(); i++) {
+		//Only data segment contains variable labels
+		if (lines[i].section != DATA_SECTION)
+			continue;
+
+		auto list = split(lines[i].line, ' ');
+		std::string label = list[0];
+		label.pop_back(); // Remove ':'
+
+		bool search = false;
+		std::string directive;
+		for (int j = 1; j < list.size(); j++) {
+			if (search) {
+				int arg;
+				try {
+					arg = std::stoi(list[j]);
+				}
+				catch (exception e) {
+					throw "Could not parse label in .data line: " + std::to_string(lines[i].original_line_number);
+				}
+				search = false;
+				label_map[label] = global_pointer;
+				//Öka global pointer olika mycket beroende på directive: ( ONLT .space working for now)
+				//if (directive.compare(".word") == 0) { global_pointer += 4; }
+				if (directive.compare(".space") == 0) { global_pointer += arg; }
+			}
+			//Find asm directive
+			if (list[j].at(0) == '.') {
+				search = true;
+				directive = list[j];
+				remove_leading_whitespace(directive);
+			}
+		}
+	}
+
+	//Extract .text labels and add to map
 	int instruction_adress = 0;
 	for (int i = 0; i < lines.size(); i++) {
+		if (lines[i].section != TEXT_SECTION)
+			continue;
+
 		//Labels are one word and ends with a semicolon
 		auto words = split(lines[i].line, ' ');
 		if (words.size() == 1 && words[0].back() == ':') {
-			lines[i].line.pop_back();
+			lines[i].line.pop_back(); // Remove ':'
 			label_map[lines[i].line] = instruction_adress;
 			lines.erase(lines.begin() + i);
 			i--;
@@ -141,6 +208,10 @@ std::vector<uint32_t> Assembler::assemble_file(std::string path)
 
 	//Assemble individual instructions:
 	for (line_holder& holder : lines) {
+		//Instructions are only stored in the .text segment
+		if (holder.section != TEXT_SECTION)
+			continue;
+
 		try {
 			auto inst = decode_single_instruction(holder.line);
 			instructions.push_back(inst);
@@ -155,14 +226,24 @@ std::vector<uint32_t> Assembler::assemble_file(std::string path)
 	return instructions;
 }
 
-void Assembler::write_file(const std::vector<uint32_t>& instructions)
+void Assembler::write_file(std::string path, const std::vector<uint32_t>& instructions, bool binary)
 {
 	//Create stream to file
 	std::ofstream file;
-	file.open(std::filesystem::current_path().string() + "\\out.txt");
+	file.open(path);
 	file << "Asm24 machinecode file v1.0\n";
 	for (const uint32_t& inst : instructions) {
-		file << inst << "\n";
+		if (binary) {
+			
+			for (int i = 0; i < 3; i++) {
+				int byte = (inst >> (i * 8)) & 0xFF;
+				file << byte << ", ";
+			}
+			
+		}
+		else {
+			file << inst << "\n";
+		}
 	}
 	file.close();
 }
@@ -189,5 +270,6 @@ Assembler::Assembler()
 	instruction_map["LOAD"]  = instruction_definition{ 0x44, IR_TYPE };
 	instruction_map["BZ"]    = instruction_definition{ 0x45, IR_TYPE };
 	instruction_map["BNZ"]   = instruction_definition{ 0x46, IR_TYPE };
+	instruction_map["JR"]    = instruction_definition{ 0x47, IR_TYPE };
 }
 

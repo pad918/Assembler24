@@ -24,12 +24,18 @@
     <ClCompile Include="vAssembler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Arguments.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StringMagic.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="vAssembler.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Arguments.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

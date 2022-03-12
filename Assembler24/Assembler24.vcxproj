@@ -151,11 +151,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Arguments.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="StringMagic.cpp" />
     <ClCompile Include="vAssembler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Arguments.h" />
     <ClInclude Include="StringMagic.h" />
     <ClInclude Include="vAssembler.h" />
   </ItemGroup>
