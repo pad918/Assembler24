@@ -323,20 +323,24 @@ Assembler::Assembler()
 	instruction_map["AND"]   = instruction_definition {0x02, R_TYPE};
 	instruction_map["OR"]    = instruction_definition {0x03, R_TYPE};
 	instruction_map["SLT"]   = instruction_definition {0x04, R_TYPE};
+	instruction_map["SLL"]   = instruction_definition {0x05, R_TYPE};
+	instruction_map["SLR"]   = instruction_definition {0x06, R_TYPE};
 
 	//I-type
 	instruction_map["JAL"]   = instruction_definition{ 0xF0, I_TYPE };
 	instruction_map["LTA"]   = instruction_definition{ 0xF1, I_TYPE };
 
 	//IR-type
-	instruction_map["ADDI"]  = instruction_definition{ 0x40, IR_TYPE };
-	instruction_map["ANDI"]  = instruction_definition{ 0x41, IR_TYPE };
-	instruction_map["ORI"]   = instruction_definition{ 0x42, IR_TYPE };
-	instruction_map["STORE"] = instruction_definition{ 0x43, IR_TYPE };
-	instruction_map["LOAD"]  = instruction_definition{ 0x44, IR_TYPE };
-	instruction_map["BZ"]    = instruction_definition{ 0x45, IR_TYPE };
-	instruction_map["BNZ"]   = instruction_definition{ 0x46, IR_TYPE };
-	instruction_map["JR"]    = instruction_definition{ 0x47, IR_TYPE };
-	instruction_map["SEND"]  = instruction_definition{ 0x48, IR_TYPE };
+	instruction_map["ADDI"]    = instruction_definition{ 0x40, IR_TYPE };
+	instruction_map["ANDI"]    = instruction_definition{ 0x41, IR_TYPE };
+	instruction_map["ORI"]     = instruction_definition{ 0x42, IR_TYPE };
+	instruction_map["STORE"]   = instruction_definition{ 0x43, IR_TYPE };
+	instruction_map["STORE_B"] = instruction_definition{ 0x49, IR_TYPE };
+	instruction_map["LOAD"]    = instruction_definition{ 0x44, IR_TYPE };
+	instruction_map["LOAD_B"]  = instruction_definition{ 0x4A, IR_TYPE };
+	instruction_map["BZ"]      = instruction_definition{ 0x45, IR_TYPE };
+	instruction_map["BNZ"]     = instruction_definition{ 0x46, IR_TYPE };
+	instruction_map["JR"]      = instruction_definition{ 0x47, IR_TYPE };
+	instruction_map["SEND"]    = instruction_definition{ 0x48, IR_TYPE };
 }
 

@@ -42,8 +42,8 @@ public:
 
 
 
-	std::vector<std::string> R_type = { "ADD", "SUB", "SLT", "AND", "OR" };
-	std::vector<std::string> IR_type = { "ADDI", "AND", "OR", "STORE", "LOAD", "BZ", "BNZ", "JR", "SEND"};
+	std::vector<std::string> R_type = { "ADD", "SUB", "SLT", "AND", "OR", "SLL", "SRL"};
+	std::vector<std::string> IR_type = { "ADDI", "AND", "OR", "STORE", "STORE_B" , "LOAD", "LOAD_B", "BZ", "BNZ", "JR", "SEND"};
 	std::vector<std::string> I_type = { "JAL", "LTA" };
 	
 	uint32_t decode_single_instruction(std::string line);
