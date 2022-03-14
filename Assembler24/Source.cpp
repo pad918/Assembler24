@@ -19,7 +19,9 @@ int main(int argc, char* argv[]) {
 /*
 TO DO :
 
-	.text, .data section and global labels/variables
+	pseudo instructions
+
+	global
 
 	# include other asm files
 

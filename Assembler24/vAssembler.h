@@ -43,7 +43,7 @@ public:
 
 
 	std::vector<std::string> R_type = { "ADD", "SUB", "SLT", "AND", "OR" };
-	std::vector<std::string> IR_type = { "ADDI", "AND", "OR", "STORE", "LOAD", "BZ", "BNZ", "JR"};
+	std::vector<std::string> IR_type = { "ADDI", "AND", "OR", "STORE", "LOAD", "BZ", "BNZ", "JR", "SEND"};
 	std::vector<std::string> I_type = { "JAL", "LTA" };
 	
 	uint32_t decode_single_instruction(std::string line);
@@ -51,6 +51,10 @@ public:
 	std::vector<int32_t> get_arguments(std::vector<std::string>& inst_arguments);
 	std::vector<string> get_argument_strings(std::string line);
 	
+	void add_include_file(std::vector<line_holder> & lines, std::string include);
+
+	void handle_includes(std::vector<line_holder> & assembly_lines);
+
 	std::vector<uint32_t> assemble_file(std::string path);
 	void write_file(std::string path, const std::vector<uint32_t>& instructions, bool binary);
 };

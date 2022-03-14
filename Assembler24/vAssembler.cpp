@@ -2,12 +2,13 @@
 
 uint32_t Assembler::decode_single_instruction(std::string line)
 {
+	static int l = 0;
 	uint32_t inst24 = 0;
 
 	//Remove whitespace and get instruction (nuematic?)
 	remove_leading_whitespace(line);
 	string inst = get_first_word(line);
-	std::cout << "INST TYPE = |" << inst << "|\n";
+	std::cout << l++ <<  ": INST TYPE = |" << inst << "|\n";
 
 	//Get list of arguments as strings
 	auto args_strings = get_argument_strings(line);
@@ -96,6 +97,65 @@ std::vector<string> Assembler::get_argument_strings(std::string line)
 	return arguments;
 }
 
+void Assembler::add_include_file(std::vector<line_holder>& lines, std::string include)
+{
+	include.erase(0, 7);
+	remove_leading_whitespace(include);
+	
+	//Load file
+	string line;
+	std::ifstream file_stream(include);
+	int i = 1;
+
+	line_holder comment_spacer;
+	comment_spacer.line = "############### include file " + include + "###############";
+	comment_spacer.original_line_number = -1;
+	comment_spacer.section = NO_SECTION;
+
+	lines.push_back(comment_spacer);
+
+	//Load all lines to the end of the assembly file
+	while (std::getline(file_stream, line)) {
+		line_holder holder;
+		holder.original_line_number = i++;
+		holder.line = line;
+		lines.push_back(holder);
+	}
+
+	handle_includes(lines);	// Problem?
+}
+
+void Assembler::handle_includes(std::vector<line_holder>& assembly_lines)
+{
+	/* 
+	For every included file:
+		Copy and paste inlude files at the bottom of the file.
+		rename labels so that "label:" becomes "file1::label:" and so on.
+	
+	*/
+
+	//Find all includes
+	std::vector<std::string> includes;
+	for (int i = 0; i < assembly_lines.size(); i++) {
+		remove_leading_whitespace(assembly_lines[i].line);
+		if (assembly_lines[i].line.compare(0, 7, "include") == 0) {
+			//Add include and remove line
+			includes.push_back(assembly_lines[i].line);
+			assembly_lines.erase(assembly_lines.begin() + i);
+			i--;
+		}
+
+	}
+
+	// Include all includes
+	for (auto inc : includes) {
+		add_include_file(assembly_lines, inc);
+	}
+
+}
+
+
+
 std::vector<uint32_t> Assembler::assemble_file(std::string path)
 {
 
@@ -113,8 +173,14 @@ std::vector<uint32_t> Assembler::assemble_file(std::string path)
 		lines.push_back(holder);
 	}
 
-	//Macros?
+	//Handle include files:
+	handle_includes(lines);
 	
+	//PRINT FILE WITH ALL INCLUDES (DEBUG)
+	std::cout << "\nFILE WITH INCLUDES\n";
+	for (auto line : lines)
+		std::cout << line.line << std::endl;
+	std::cout << "\nEND\n\n";
 	
 	//Remove empty lines and whitespace and comments and section specifyers:
 	Section section = NO_SECTION;
@@ -252,15 +318,15 @@ Assembler::Assembler()
 {
 	// Add all instructions:
 	//R-type:
-	instruction_map["ADD"] = instruction_definition {0x00, R_TYPE};
-	instruction_map["SUB"] = instruction_definition {0x01, R_TYPE};
-	instruction_map["AND"] = instruction_definition {0x02, R_TYPE};
-	instruction_map["OR"]  = instruction_definition {0x03, R_TYPE};
-	instruction_map["SLT"] = instruction_definition {0x04, R_TYPE};
+	instruction_map["ADD"]   = instruction_definition {0x00, R_TYPE};
+	instruction_map["SUB"]   = instruction_definition {0x01, R_TYPE};
+	instruction_map["AND"]   = instruction_definition {0x02, R_TYPE};
+	instruction_map["OR"]    = instruction_definition {0x03, R_TYPE};
+	instruction_map["SLT"]   = instruction_definition {0x04, R_TYPE};
 
 	//I-type
-	instruction_map["JAL"] = instruction_definition{ 0xF0, I_TYPE };
-	instruction_map["LTA"] = instruction_definition{ 0xF1, I_TYPE };
+	instruction_map["JAL"]   = instruction_definition{ 0xF0, I_TYPE };
+	instruction_map["LTA"]   = instruction_definition{ 0xF1, I_TYPE };
 
 	//IR-type
 	instruction_map["ADDI"]  = instruction_definition{ 0x40, IR_TYPE };
@@ -271,5 +337,6 @@ Assembler::Assembler()
 	instruction_map["BZ"]    = instruction_definition{ 0x45, IR_TYPE };
 	instruction_map["BNZ"]   = instruction_definition{ 0x46, IR_TYPE };
 	instruction_map["JR"]    = instruction_definition{ 0x47, IR_TYPE };
+	instruction_map["SEND"]  = instruction_definition{ 0x48, IR_TYPE };
 }
 

@@ -1,16 +1,42 @@
+include test_include.asm
+
 .data
-	arr: .space 16      # 4 word long array
-
+	arr: .space 64      # 16 word long array
 .text
-	ADD $a0, $0, $0
-	ADDI $a0, 3		# Satt $a0 till 3
-loop:
-	ADDI $a0, -1	# $a0 --
-	LTA arr			# Load array pointer
-	ADD $at, $at, $a1	 
-	STORE $a0, 0	# Store at arr pointer
-	ADDI $a1, 4		# $a1 += 4
-	BNZ $a0, loop	# for(a0 = 3; $a0!=0; a0--)
+	LTA arr
 
-end:
-	ADD $0, $0, $0	# NOP
+	# F
+	ADD $s0, $0, $0
+	ADDI $s0, 70	
+	STORE $s0, 0
+
+	# O
+	ADD $s0, $0, $0
+	ADDI $s0, 111	
+	STORE $s0, 4
+
+	# U
+	ADD $s0, $0, $0
+	ADDI $s0, 117	
+	STORE $s0, 8
+
+	# N
+	ADD $s0, $0, $0
+	ADDI $s0, 110	
+	STORE $s0, 12
+
+	# D
+	ADD $s0, $0, $0
+	ADDI $s0, 100	
+	STORE $s0, 16
+
+	# \n
+	ADD $s0, $0, $0
+	ADDI $s0, 10	
+	STORE $s0, 20
+	
+	#Print array
+	JAL print_arr
+
+	#Exit
+	ADD $0, $0, $0
